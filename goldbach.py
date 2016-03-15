@@ -1,7 +1,8 @@
 # coding: utf-8
-import itertools
 
 import matplotlib.pyplot
+import itertools
+import time
 
 
 def get_prime_numbers(max_value):
@@ -25,22 +26,33 @@ def get_even_numbers(max_value):
     return range(4, max_value + 2, 2)
 
 
-def get_number_of_decisions(prime_numbers, number):
-    prime_numbers_less_than_number = filter(lambda n: n < number, prime_numbers)
-    premutations = itertools.permutations(prime_numbers_less_than_number, 2)
-    premutations_sums = [x + y for x, y in premutations]
-    equal_to_number_sums = list(filter(lambda s: s == number, premutations_sums))
-    return len(equal_to_number_sums) / 2
-
-
-if __name__ == '__main__':
-    number = 1000
-
+def calc(number, show_graph=True):
     prime_numbers = list(get_prime_numbers(number))
-    numbers_list = get_even_numbers(number)
+    numbers_list = list(get_even_numbers(number))
 
-    numbers_of_decisions = [get_number_of_decisions(prime_numbers, n) for n in numbers_list]
+    premutations = itertools.combinations(prime_numbers, 2)
+    premutations_sums = [x + y for x, y in premutations]
+    premutations_sums = list(sorted(premutations_sums))
+    grouped_sums = itertools.groupby(premutations_sums)
 
-    matplotlib.pyplot.plot(numbers_list, numbers_of_decisions, 'ro')
+    sums = [len(list(s)) for n, s in grouped_sums if n in numbers_list]
+
+    if show_graph:
+        matplotlib.pyplot.plot(numbers_list, sums, '.')
+        matplotlib.pyplot.show()
+
+
+def work_time():
+    numbers = list(range(0, 10100, 100))
+    times = []
+    for x in numbers:
+        begin = time.time()
+        calc(x, False)
+        times.append(time.time() - begin)
+
+    matplotlib.pyplot.plot(numbers, times, '.')
     matplotlib.pyplot.show()
+
+
+calc(2 * 10**4)
 
